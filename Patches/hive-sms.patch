@@ -1,0 +1,67 @@
+Index: ql/src/java/org/apache/hadoop/hive/ql/exec/ExecDriver.java
+===================================================================
+--- ql/src/java/org/apache/hadoop/hive/ql/exec/ExecDriver.java	(revision 791534)
++++ ql/src/java/org/apache/hadoop/hive/ql/exec/ExecDriver.java	(working copy)
+@@ -703,6 +703,8 @@
+         String newFile = hiveScratchDir + File.separator + (++numEmptyPaths);
+         Path newPath = new Path(newFile);
+         LOG.info("Changed input file to " + newPath.toString());
++        //CHANGE
++        job.set(newPath.toString(), new Path(emptyFile).getName());
+         
+         // toggle the work
+         LinkedHashMap<String, ArrayList<String>> pathToAliases = work.getPathToAliases();
+Index: ql/src/java/org/apache/hadoop/hive/ql/io/HiveInputFormat.java
+===================================================================
+--- ql/src/java/org/apache/hadoop/hive/ql/io/HiveInputFormat.java	(revision 791534)
++++ ql/src/java/org/apache/hadoop/hive/ql/io/HiveInputFormat.java	(working copy)
+@@ -98,6 +98,9 @@
+       if (inputSplit instanceof FileSplit) {
+         return ((FileSplit)inputSplit).getPath();
+       }
++      if(inputSplit instanceof Pathable){
++        return ((Pathable)inputSplit).getPath();
++      }
+       return new Path("");
+     }
+ 
+Index: ql/src/java/org/apache/hadoop/hive/ql/io/Pathable.java
+===================================================================
+--- ql/src/java/org/apache/hadoop/hive/ql/io/Pathable.java	(revision 0)
++++ ql/src/java/org/apache/hadoop/hive/ql/io/Pathable.java	(revision 0)
+@@ -0,0 +1,6 @@
++package org.apache.hadoop.hive.ql.io;
++import org.apache.hadoop.fs.Path;
++
++public interface Pathable {
++  public Path getPath();
++}
+Index: ql/src/java/org/apache/hadoop/hive/ql/parse/SemanticAnalyzer.java
+===================================================================
+--- ql/src/java/org/apache/hadoop/hive/ql/parse/SemanticAnalyzer.java	(revision 791534)
++++ ql/src/java/org/apache/hadoop/hive/ql/parse/SemanticAnalyzer.java	(working copy)
+@@ -128,6 +128,8 @@
+ import org.apache.hadoop.hive.ql.hooks.ReadEntity;
+ import org.apache.hadoop.hive.ql.hooks.WriteEntity;
+ 
++import edu.yale.cs.hadoopdb.sms.SQLQueryGenerator;
++
+ /**
+  * Implementation of the semantic analyzer
+  */
+@@ -3896,11 +3898,15 @@
+     // from which we want to find the reduce operator
+     genMapRedTasks(qb);
+ 
++    //HadoopDB SMS
++    SQLQueryGenerator.process(conf, qb, topOps);
++    
+     LOG.info("Completed plan generation");
+ 
+     return;
+   }
+ 
++  
+   /**
+    * Generates and expression node descriptor for the expression passed in the arguments. This
+    * function uses the row resolver and the metadata informatinon that are passed as arguments

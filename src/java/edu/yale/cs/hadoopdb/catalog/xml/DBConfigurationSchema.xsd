@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://edu.yale.cs.db.hadoop/DBConfigurationSchema" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://edu.yale.cs.db.hadoop/DBConfigurationSchema">
+
+    <complexType name="Partition">
+    	<attribute name="id" type="string" use="required"></attribute>
+    	<attribute name="url" type="string" use="required"></attribute>
+    </complexType>
+
+    <complexType name="Relation">
+    	<sequence maxOccurs="unbounded" minOccurs="1">
+    		<element name="Partitions" type="tns:Partition"></element>
+    	</sequence>
+    	<attribute name="id" type="string" use="required"></attribute>
+    </complexType>
+
+    <complexType name="Node">
+    	<sequence maxOccurs="unbounded" minOccurs="1">
+    		<element name="Relations" type="tns:Relation"></element>
+    	</sequence>
+    	<attribute name="Location" type="string" use="required"></attribute>
+    	<attribute name="Driver" type="string" use="required"></attribute>
+    	<attribute name="Username" type="string" use="required"></attribute>
+    	<attribute name="Password" type="string" use="required"></attribute>
+    </complexType>
+
+    <complexType name="Configuration">
+    	<sequence maxOccurs="unbounded" minOccurs="1">
+    		<element name="Nodes" type="tns:Node"></element>
+    	</sequence>
+    </complexType>
+
+    <element name="DBClusterConfiguration" type="tns:Configuration"></element>
+</schema>
