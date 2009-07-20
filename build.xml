@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project name="HadoopDB" default="build" basedir=".">
+
+	<property file="build.properties"/>
+	<property file="local.build.properties"/>			
+
+	<!-- Hadoop and Hive jars should be there -->
+	<path id="compile.classpath">
+		<fileset dir="${lib}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	
+	<target name="build" depends="compile,jar">
+	</target>
+	
+	<target name="compile" description="Compiles the source code" depends="deleteclasses">
+		
+		<mkdir dir="${build}"/>
+		<mkdir dir="${classes}"/>
+		
+		<!-- Compile generated sources -->
+	    <javac debug="${debug}" 
+			verbose="${verbose}" 
+			destdir="${classes}"
+			srcdir="${src}"
+			includes="**/*.java"
+			classpathref="compile.classpath"
+			deprecation="false"
+			optimize="false"
+			fork="no"		
+			failonerror="true">
+		</javac>					
+	</target>
+	
+	<target name="jar" description="Creates a jar">
+
+		<mkdir dir="${build}"/>
+
+		<jar jarfile="${build}/hadoopdb.jar">	
+			<fileset dir="${classes}">
+				<include name="**/*.class"/>
+			</fileset>
+		</jar> 		
+	</target>
+
+	
+	<target name="clean" description="Delete all build files">
+		<delete dir="${build}"/>
+	</target>
+	
+
+	<target name="deleteclasses" description="Delete all compiled classes">
+		<delete dir="${classes}"/>
+	</target>
+
+</project>
