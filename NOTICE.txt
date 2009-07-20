@@ -1,0 +1,3 @@
+HadoopDB's SMS Planner component relies on Hive (http://hadoop.apache.org/hive/)
+and modified version of Hive is distributed as a binary version. A patch necessary
+to perform Hive's modification is is included under Patches directory.
