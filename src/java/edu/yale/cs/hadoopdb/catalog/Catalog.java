@@ -17,6 +17,8 @@ package edu.yale.cs.hadoopdb.catalog;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -78,9 +80,20 @@ public class Catalog {
 	 *  
 	 */
 	public void setSplitLocationStructure(BaseDBConfiguration dbConf, String relation) {
-
 		
 		dbConf.setRelation(relation);
+		for(DBChunk chunk : getSplitLocationStructure(relation)) {
+			dbConf.addChunk(chunk);
+		}
+	}	
+
+	/**
+	 * For a given relation, it returns a collection of chunks associated with the relation. 
+	 * Each chunk contains connection and location information.
+	 */
+	public Collection<DBChunk> getSplitLocationStructure(String relation) {
+		
+		Collection<DBChunk> list = new ArrayList<DBChunk>();
 
 		Map<String, List<Node>> chunkHostMap = xmlConfig
 				.getPartitionsForRelation(relation);
@@ -119,8 +132,10 @@ public class Catalog {
 									.getDriver()));
 				}
 			}
-			dbConf.addChunk(chunk);
+			list.add(chunk);
 		}
+		
+		return list;
 	}	
-
+	
 }
