@@ -30,14 +30,16 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapred.JobConf;
 
 /**
- * Base DBRecordReader class. Several extensions of this class are possible to allow different 
- * constructors and SQL query specification through abstract method getSqlQuery(). Class implements
- * all methods needed by a Hadoop's RecordReader interface except for next().
- *
+ * Base DBRecordReader class. Several extensions of this class are possible to
+ * allow different constructors and SQL query specification through abstract
+ * method getSqlQuery(). Class implements all methods needed by a Hadoop's
+ * RecordReader interface except for next().
+ * 
  */
 public abstract class AbstractDBRecordReader {
-	
-	public static final Log LOG = LogFactory.getLog(AbstractDBRecordReader.class.getName());
+
+	public static final Log LOG = LogFactory
+			.getLog(AbstractDBRecordReader.class.getName());
 	/**
 	 * Maximum number of connection trials
 	 */
@@ -47,13 +49,12 @@ public abstract class AbstractDBRecordReader {
 	protected ResultSet results;
 	protected Statement statement;
 
-
 	protected long pos = 0;
 
 	protected long startTime = 0;
 	protected long connTime = 0;
 	protected long queryTime = 0;
-	
+
 	/**
 	 * Helper method to retrieve local host name or null if not possible
 	 */
@@ -64,57 +65,65 @@ public abstract class AbstractDBRecordReader {
 			return null;
 		}
 	}
-	
+
 	/**
-	 * Abstract method definition. All extensions need to provide a sql query necessary
-	 * for retrieving rows from the database.
+	 * Abstract method definition. All extensions need to provide a sql query
+	 * necessary for retrieving rows from the database.
+	 * 
 	 * @return String standard SQL query
 	 */
 	protected abstract String getSqlQuery();
-	
+
 	/**
-	 * Method sets up a connection to a database and provides query optimization parameters. Then 
-	 * it executes the query.
+	 * Method sets up a connection to a database and provides query optimization
+	 * parameters. Then it executes the query.
 	 */
-	protected void setupDB(DBInputSplit split, JobConf conf) throws SQLException {
-	
+	protected void setupDB(DBInputSplit split, JobConf conf)
+			throws SQLException {
+
 		try {
 			startTime = System.currentTimeMillis();
-			connection = getConnection(split); 
-			//Optimization options including specifying forward direction, read-only cursor
-			//and a default fetch size to prevent db cache overloading. 
-			statement = connection
-					.createStatement(ResultSet.TYPE_FORWARD_ONLY,
-							ResultSet.CONCUR_READ_ONLY);
+			connection = getConnection(split);
+			// Optimization options including specifying forward direction,
+			// read-only cursor
+			// and a default fetch size to prevent db cache overloading.
+			statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY,
+					ResultSet.CONCUR_READ_ONLY);
 			connection.setAutoCommit(false);
 			statement.setFetchDirection(ResultSet.FETCH_FORWARD);
 			statement.setFetchSize(conf.getInt(DBConst.DB_FETCH_SIZE,
 					DBConst.SQL_DEFAULT_FETCH_SIZE));
 
 			connTime = System.currentTimeMillis();
-			
+
 			results = statement.executeQuery(getSqlQuery());
 			queryTime = System.currentTimeMillis();
 
 		} catch (SQLException e) {
-			if (results != null)
-				results.close();
-			if (statement != null)
-				statement.close();
-			if (connection != null)
-				connection.close();
+
+			try {
+				if (results != null)
+					results.close();
+				if (statement != null)
+					statement.close();
+				if (connection != null)
+					connection.close();
+			} catch (SQLException ex) {
+				LOG.info(ex, ex);
+			}
 
 			throw e;
-		}		
+		}
 	}
 
 	/**
-	 * Connects to a database of a particular chunk (specified within the split). If
-	 * a particular host fails during connection, it is avoided and another host is found.
-	 * The method fails after a set number of maximum connection trials.
+	 * Connects to a database of a particular chunk (specified within the
+	 * split). If a particular host fails during connection, it is avoided and
+	 * another host is found. The method fails after a set number of maximum
+	 * connection trials.
 	 */
 	protected Connection getConnection(DBInputSplit dbSplit) {
-		
+
 		boolean connected = false;
 		DBChunkHost avoid_host = null;
 		int connect_tries = 0;
@@ -132,9 +141,8 @@ public abstract class AbstractDBRecordReader {
 				if (avoid_host != chunk.getHost(localHostAddr))
 					chunk_host = chunk.getHost(localHostAddr);
 			}
-			LOG.info("Task from " + localHostAddr
-					+ " is connecting to chunk " + chunk.getId()
-					+ " on host " + chunk_host.getHost()
+			LOG.info("Task from " + localHostAddr + " is connecting to chunk "
+					+ chunk.getId() + " on host " + chunk_host.getHost()
 					+ " with db url " + chunk_host.getUrl());
 
 			try {
@@ -153,10 +161,10 @@ public abstract class AbstractDBRecordReader {
 		}
 		return connection;
 	}
-	
 
 	/**
-	 * After query execution is complete, the database connection is closed cleanly.
+	 * After query execution is complete, the database connection is closed
+	 * cleanly.
 	 */
 	public void close() throws IOException {
 		try {
@@ -164,10 +172,9 @@ public abstract class AbstractDBRecordReader {
 			statement.close();
 			connection.close();
 			long endTime = System.currentTimeMillis();
-			LOG.info("DB times (ms): connection = "
-					+ (connTime - startTime) + ", query execution = "
-					+ (queryTime - connTime) + ", row retrieval  = "
-					+ (endTime - queryTime));
+			LOG.info("DB times (ms): connection = " + (connTime - startTime)
+					+ ", query execution = " + (queryTime - connTime)
+					+ ", row retrieval  = " + (endTime - queryTime));
 			LOG.info("Rows retrieved = " + getPos());
 
 		} catch (SQLException e) {
@@ -177,24 +184,24 @@ public abstract class AbstractDBRecordReader {
 
 	}
 
-	
 	public LongWritable createKey() {
 		return new LongWritable();
 	}
+
 	/**
-	 * Returns the number of rows retrieved so far. This value is updated by record reader sub-classes.
+	 * Returns the number of rows retrieved so far. This value is updated by
+	 * record reader sub-classes.
 	 */
 	public long getPos() throws IOException {
 		return pos;
 	}
 
 	/**
-	 * Returns a float [0,1] indicating progress (currently, progress is always 0 as there is
-	 * no easy way for progress estimation).
+	 * Returns a float [0,1] indicating progress (currently, progress is always
+	 * 0 as there is no easy way for progress estimation).
 	 */
 	public float getProgress() throws IOException {
 		return 0;
 	}
-	
 
 }
