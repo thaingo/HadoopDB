@@ -26,6 +26,18 @@ import org.apache.hadoop.fs.Path;
  */
 public class HDFSUtil {
 	
+
+	/**
+	 * Check whether HDFS path exists. 
+	 */
+	public static boolean existsPath(Path path) throws IOException {
+		Configuration fconf = new Configuration();
+		FileSystem fs = FileSystem.get(fconf);
+		
+		return fs.exists(path);
+		
+	}
+	
 	/**
 	 * Deletes HDFS path if it exists. 
 	 */
