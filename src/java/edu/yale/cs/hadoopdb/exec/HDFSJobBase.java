@@ -19,6 +19,8 @@ package edu.yale.cs.hadoopdb.exec;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobConf;
@@ -33,6 +35,8 @@ import org.apache.hadoop.util.ToolRunner;
  */
 public abstract class HDFSJobBase extends Configured implements Tool {
 
+	public static final Log LOG = LogFactory.getLog(HDFSJobBase.class.getName());
+	
 	/**
 	 * Override this method to set job-specific options
 	 */
