@@ -97,6 +97,9 @@ public class Catalog {
 
 		Map<String, List<Node>> chunkHostMap = xmlConfig
 				.getPartitionsForRelation(relation);
+		if(chunkHostMap == null) {
+			throw new RuntimeException("Relation '" + relation + "' is not defined in the catalog.");
+		}
 		Set<Node> usedNodes = new HashSet<Node>();
 		for (String chunk_id : chunkHostMap.keySet()) {
 			DBChunk chunk = new DBChunk(chunk_id);
