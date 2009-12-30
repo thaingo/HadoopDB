@@ -95,7 +95,7 @@ public abstract class AbstractDBRecordReader {
 					DBConst.SQL_DEFAULT_FETCH_SIZE));
 
 			connTime = System.currentTimeMillis();
-
+			LOG.info(getSqlQuery());
 			results = statement.executeQuery(getSqlQuery());
 			queryTime = System.currentTimeMillis();
 
