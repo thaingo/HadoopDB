@@ -100,9 +100,16 @@ public abstract class DBJobBase extends Configured implements Tool {
 			conf.set(DBConst.DB_CONFIG_FILE, configuration_file.toString());
 		}				
 
-		conf.setInputFormat(DBJobBaseInputFormat.class);
+		setInputFormat(conf);
 
 		return conf;
+	}
+	
+	/**
+	 * Sets an input format (DBJobBaseInputFormat by default)
+	 */
+	protected void setInputFormat(JobConf conf) {
+		conf.setInputFormat(DBJobBaseInputFormat.class);
 	}
 
 	public int run(String[] args) throws Exception {
