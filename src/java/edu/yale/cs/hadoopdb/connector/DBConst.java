@@ -26,6 +26,8 @@ public interface DBConst {
 	public static final String DB_FETCH_SIZE = "hadoopdb.fetch.size";
 	public static final String DB_CONFIG_FILE = "hadoopdb.config.file";
 	public static final String DB_REPLICATION = "hadoopdb.config.replication";
+	public static final String DB_SQL_PREPARER = "hadoopdb.sql.preparer";
+	
 	/**
 	 * Required for large datasets in MySQL
 	 */

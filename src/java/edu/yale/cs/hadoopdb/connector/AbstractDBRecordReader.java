@@ -28,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.util.ReflectionUtils;
 
 /**
  * Base DBRecordReader class. Several extensions of this class are possible to
@@ -95,8 +96,11 @@ public abstract class AbstractDBRecordReader {
 					DBConst.SQL_DEFAULT_FETCH_SIZE));
 
 			connTime = System.currentTimeMillis();
-			LOG.info(getSqlQuery());
-			results = statement.executeQuery(getSqlQuery());
+
+			String sql = prepareSqlQuery(getSqlQuery(), split, conf);
+
+			LOG.info(sql);
+			results = statement.executeQuery(sql);
 			queryTime = System.currentTimeMillis();
 
 		} catch (SQLException e) {
@@ -113,6 +117,25 @@ public abstract class AbstractDBRecordReader {
 			}
 
 			throw e;
+		}
+	}
+
+	/**
+	 * Prepares a SQL query, if no preparer specified then returns the same sqlQuery
+	 */
+	protected String prepareSqlQuery(String sqlQuery, DBInputSplit split,
+			JobConf conf) {
+		String preparerClass = conf.get(DBConst.DB_SQL_PREPARER);
+		if (preparerClass == null) {
+			return sqlQuery;
+		} else {
+			try {
+				SQLPreparer sqlPreparer = (SQLPreparer) ReflectionUtils
+						.newInstance(Class.forName(preparerClass), conf);
+				return sqlPreparer.prepare(sqlQuery, split, conf);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
