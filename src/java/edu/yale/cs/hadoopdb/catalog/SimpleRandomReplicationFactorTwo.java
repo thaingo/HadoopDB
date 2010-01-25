@@ -34,8 +34,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 
-import org.apache.hadoop.hive.ql.parse.HiveParser.propertiesList_return;
-
 import edu.yale.cs.hadoopdb.catalog.xml.Configuration;
 import edu.yale.cs.hadoopdb.catalog.xml.Node;
 import edu.yale.cs.hadoopdb.catalog.xml.ObjectFactory;
