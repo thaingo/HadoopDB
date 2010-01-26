@@ -77,6 +77,7 @@ public abstract class DBJobBase extends Configured implements Tool {
 		JobConf conf = null;
 
 		conf = configureJob(other_args.toArray(new String[0]));
+		LOG.info(conf.getJobName());
 		LOG.info(conf.get(DBConst.DB_SQL_QUERY));
 
 		if (conf.get(DBConst.DB_RELATION_ID) == null || conf.get(DBConst.DB_SQL_QUERY) == null

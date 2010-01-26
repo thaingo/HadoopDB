@@ -61,10 +61,11 @@ public abstract class HDFSJobBase extends Configured implements Tool {
 			return printHDFSUsage();
 		}
 
+		LOG.info(conf.getJobName());
 		JobClient.runJob(conf);
 		
 		long endTime = System.currentTimeMillis();
-		System.out.println("\nJOB TIME : " + (endTime - startTime)
+		LOG.info("\nJOB TIME : " + (endTime - startTime)
 				+ " ms.\n");
 		
 		return 0;
