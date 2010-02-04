@@ -125,7 +125,7 @@ public abstract class DBJobBase extends Configured implements Tool {
 		JobClient.runJob(conf);
 
 		long endTime = System.currentTimeMillis();
-		LOG.info("\nJOB TIME : " + (endTime - startTime) + " ms.\n");
+		LOG.info("\n" + conf.getJobName() + " JOB TIME : " + (endTime - startTime) + " ms.\n");
 
 		return 0;
 	}
