@@ -161,8 +161,11 @@ public abstract class AbstractDBRecordReader {
 				LOG.info("Data locality failed for " + localHostAddr);
 				chunk_host = chunk.getAnyHost(avoid_host);
 			} else {
-				if (avoid_host != chunk.getHost(localHostAddr))
+				if (avoid_host != chunk.getHost(localHostAddr)) {
 					chunk_host = chunk.getHost(localHostAddr);
+				} else {
+					chunk_host = chunk.getAnyHost(avoid_host);
+				}
 			}
 			LOG.info("Task from " + localHostAddr + " is connecting to chunk "
 					+ chunk.getId() + " on host " + chunk_host.getHost()
