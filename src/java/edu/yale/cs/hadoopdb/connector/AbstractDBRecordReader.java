@@ -174,6 +174,8 @@ public abstract class AbstractDBRecordReader {
 						chunk_host.getUser(), chunk_host.getPassword());
 				connected = true;
 			} catch (Exception e) {
+				LOG.info("An error connecting to the database. See below for details.");
+				LOG.info(e);
 				if (connect_tries < MAX_CONNECTION_TRIALS) {
 					connect_tries++;
 					avoid_host = chunk_host;
